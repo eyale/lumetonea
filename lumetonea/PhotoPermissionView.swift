@@ -4,6 +4,7 @@ import UIKit
 
 struct PhotoPermissionView: View {
     @State private var cameraAuthorized = AVCaptureDevice.authorizationStatus(for: .video) == .authorized
+    @State private var cameraAvailable = UIImagePickerController.isSourceTypeAvailable(.camera)
     @State private var showCameraPicker = false
     @State private var showLibraryPicker = false
     @State private var selectedImage: UIImage?
@@ -15,7 +16,9 @@ struct PhotoPermissionView: View {
                 .multilineTextAlignment(.center)
                 .foregroundColor(.black)
 
-            if cameraAuthorized {
+            let status = AVCaptureDevice.authorizationStatus(for: .video)
+
+            if cameraAuthorized && cameraAvailable {
                 Button("Take Photo") {
                     showCameraPicker = true
                 }
@@ -25,19 +28,9 @@ struct PhotoPermissionView: View {
                 .foregroundColor(.white)
                 .cornerRadius(8)
             } else {
-                Button("Allow Camera Access") {
-                    requestCameraPermission()
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.black)
-                .foregroundColor(.white)
-                .cornerRadius(8)
-
-                let status = AVCaptureDevice.authorizationStatus(for: .video)
-                if status == .denied || status == .restricted {
-                    Button("Upload from Photos") {
-                        showLibraryPicker = true
+                if cameraAvailable && status != .denied && status != .restricted {
+                    Button("Allow Camera Access") {
+                        requestCameraPermission()
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -45,6 +38,15 @@ struct PhotoPermissionView: View {
                     .foregroundColor(.white)
                     .cornerRadius(8)
                 }
+
+                Button("Upload from Photos") {
+                    showLibraryPicker = true
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.black)
+                .foregroundColor(.white)
+                .cornerRadius(8)
             }
 
             NavigationLink(destination: ConfirmPhotoView(image: selectedImage), isActive: $navigateToConfirm) {
@@ -66,10 +68,15 @@ struct PhotoPermissionView: View {
     }
 
     private func requestCameraPermission() {
+        guard cameraAvailable else {
+            showLibraryPicker = true
+            return
+        }
+
         AVCaptureDevice.requestAccess(for: .video) { granted in
             DispatchQueue.main.async {
                 cameraAuthorized = granted
-                showCameraPicker = granted
+                showCameraPicker = granted && cameraAvailable
             }
         }
     }
