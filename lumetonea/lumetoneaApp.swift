@@ -12,6 +12,9 @@ struct lumetoneaApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .font(.system(size: 17))
+                .tint(.blue)
         }
     }
 }
+
