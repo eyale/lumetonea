@@ -49,21 +49,25 @@ struct PhotoPermissionView: View {
                 .cornerRadius(8)
             }
 
-            NavigationLink(destination: ConfirmPhotoView(image: selectedImage), isActive: $navigateToConfirm) {
-                EmptyView()
-            }
         }
         .padding()
         .background(Color.white)
-        .sheet(isPresented: $showCameraPicker) {
+        .navigationTitle("Add Photo")
+        .navigationBarTitleDisplayMode(.inline)
+        .fullScreenCover(isPresented: $showCameraPicker) {
             ImagePicker(image: $selectedImage, sourceType: .camera) {
                 navigateToConfirm = selectedImage != nil
             }
+            .ignoresSafeArea()
         }
-        .sheet(isPresented: $showLibraryPicker) {
+        .fullScreenCover(isPresented: $showLibraryPicker) {
             ImagePicker(image: $selectedImage, sourceType: .photoLibrary) {
                 navigateToConfirm = selectedImage != nil
             }
+            .ignoresSafeArea()
+        }
+        .navigationDestination(isPresented: $navigateToConfirm) {
+            ConfirmPhotoView(image: selectedImage)
         }
     }
 
