@@ -19,34 +19,37 @@ struct PhotoPermissionView: View {
             let status = AVCaptureDevice.authorizationStatus(for: .video)
 
             if cameraAuthorized && cameraAvailable {
-                Button("Take Photo") {
-                    showCameraPicker = true
+                Button(action: { showCameraPicker = true }) {
+                    Text("Take Photo")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .foregroundColor(.white)
+                        .background(Color.navyBlue)
+                        .cornerRadius(8)
                 }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.black)
-                .foregroundColor(.white)
-                .cornerRadius(8)
+                .contentShape(Rectangle())
             } else {
                 if cameraAvailable && status != .denied && status != .restricted {
-                    Button("Allow Camera Access") {
-                        requestCameraPermission()
+                    Button(action: { requestCameraPermission() }) {
+                        Text("Allow Camera Access")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .foregroundColor(.white)
+                            .background(Color.navyBlue)
+                            .cornerRadius(8)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.black)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
+                    .contentShape(Rectangle())
                 }
 
-                Button("Upload from Photos") {
-                    showLibraryPicker = true
+                Button(action: { showLibraryPicker = true }) {
+                    Text("Upload from Photos")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .foregroundColor(.white)
+                        .background(Color.navyBlue)
+                        .cornerRadius(8)
                 }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.black)
-                .foregroundColor(.white)
-                .cornerRadius(8)
+                .contentShape(Rectangle())
             }
 
         }

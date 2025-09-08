@@ -13,7 +13,7 @@ struct lumetoneaApp: App {
         WindowGroup {
             ContentView()
                 .font(.system(size: 17))
-                .tint(.blue)
+                .tint(.navyBlue)
         }
     }
 }

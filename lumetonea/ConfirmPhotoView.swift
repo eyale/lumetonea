@@ -4,8 +4,6 @@ import UIKit
 struct ConfirmPhotoView: View {
     let image: UIImage?
 
-    @Environment(\.dismiss) private var dismiss
-
     var body: some View {
         VStack(spacing: 24) {
             if let image = image {
@@ -19,24 +17,22 @@ struct ConfirmPhotoView: View {
                     .foregroundColor(.black)
             }
 
-            Button("Confirm Photo") {
+            Button(action: {
                 // Handle confirmation logic
+            }) {
+                Text("Confirm Photo")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .foregroundColor(.white)
+                    .background(Color.navyBlue)
+                    .cornerRadius(8)
             }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color.black)
-            .foregroundColor(.white)
-            .cornerRadius(8)
+            .contentShape(Rectangle())
         }
         .padding()
         .background(Color.white)
         .navigationTitle("Confirm")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button("Back") { dismiss() }
-            }
-        }
     }
 }
 
