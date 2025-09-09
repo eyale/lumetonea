@@ -87,20 +87,22 @@ final class SkinToneExtractor {
         var points: [CGPoint] = []
 
         let imageSize = CGSize(width: cgImage.width, height: cgImage.height)
+        let faceRect = VNImageRectForNormalizedRect(face.boundingBox, Int(imageSize.width), Int(imageSize.height))
 
-        if let leftCheek = landmarks.leftCheek?.normalizedPoints.first {
-            points.append(self.point(from: leftCheek, in: face, imageSize: imageSize))
-        }
-        if let rightCheek = landmarks.rightCheek?.normalizedPoints.first {
-            points.append(self.point(from: rightCheek, in: face, imageSize: imageSize))
-        }
+        // Approximate cheek positions using the face bounding box
+        let leftCheek = CGPoint(x: faceRect.minX + faceRect.width * 0.3, y: faceRect.midY)
+        let rightCheek = CGPoint(x: faceRect.maxX - faceRect.width * 0.3, y: faceRect.midY)
+        points.append(contentsOf: [leftCheek, rightCheek])
+
+        // Estimate a forehead point using the eyes as a reference
         if let leftEye = landmarks.leftEye?.normalizedPoints.first,
            let rightEye = landmarks.rightEye?.normalizedPoints.first {
             let left = self.point(from: leftEye, in: face, imageSize: imageSize)
             let right = self.point(from: rightEye, in: face, imageSize: imageSize)
             let midX = (left.x + right.x) / 2
-            let minY = min(left.y, right.y)
-            let forehead = CGPoint(x: midX, y: minY - face.boundingBox.height * imageSize.height * 0.15)
+            let maxY = max(left.y, right.y)
+            let foreheadY = min(faceRect.maxY, maxY + faceRect.height * 0.15)
+            let forehead = CGPoint(x: midX, y: foreheadY)
             points.append(forehead)
         }
 
