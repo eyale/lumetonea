@@ -4,11 +4,28 @@ extension UIImage {
     /// Returns a copy of the image with its orientation normalized to `.up`,
     /// removing any mirrored or rotated state.
     func normalizedOrientation() -> UIImage {
-        if imageOrientation == .up { return self }
-        UIGraphicsBeginImageContextWithOptions(size, false, scale)
-        draw(in: CGRect(origin: .zero, size: size))
+        var image = self
+
+        if image.imageOrientation.isMirrored {
+            image = image.withHorizontallyFlippedOrientation()
+        }
+        if image.imageOrientation == .up { return image }
+
+        UIGraphicsBeginImageContextWithOptions(image.size, false, image.scale)
+        image.draw(in: CGRect(origin: .zero, size: image.size))
         let normalizedImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        return normalizedImage ?? self
+        return normalizedImage ?? image
+    }
+}
+
+private extension UIImage.Orientation {
+    var isMirrored: Bool {
+        switch self {
+        case .upMirrored, .downMirrored, .leftMirrored, .rightMirrored:
+            return true
+        default:
+            return false
+        }
     }
 }
