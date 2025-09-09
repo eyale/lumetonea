@@ -18,20 +18,42 @@ struct PhotoPermissionView: View {
 
             let status = AVCaptureDevice.authorizationStatus(for: .video)
 
-            if cameraAuthorized && cameraAvailable {
-                Button(action: { showCameraPicker = true }) {
-                    Text("Take Photo")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .foregroundColor(.white)
-                        .background(Color.navyBlue)
-                        .cornerRadius(8)
-                }
-                .contentShape(Rectangle())
-            } else {
-                if cameraAvailable && status != .denied && status != .restricted {
-                    Button(action: { requestCameraPermission() }) {
-                        Text("Allow Camera Access")
+            if cameraAvailable {
+                if cameraAuthorized {
+                    Button(action: { showCameraPicker = true }) {
+                        Text("Take Photo")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .foregroundColor(.white)
+                            .background(Color.navyBlue)
+                            .cornerRadius(8)
+                    }
+                    .contentShape(Rectangle())
+                } else {
+                    if status == .denied || status == .restricted {
+                        Button(action: { openSettings() }) {
+                            Text("Allow Camera Access")
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .foregroundColor(.white)
+                                .background(Color.navyBlue)
+                                .cornerRadius(8)
+                        }
+                        .contentShape(Rectangle())
+                    } else {
+                        Button(action: { requestCameraPermission() }) {
+                            Text("Allow Camera Access")
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .foregroundColor(.white)
+                                .background(Color.navyBlue)
+                                .cornerRadius(8)
+                        }
+                        .contentShape(Rectangle())
+                    }
+
+                    Button(action: { showLibraryPicker = true }) {
+                        Text("Upload from Photos")
                             .frame(maxWidth: .infinity)
                             .padding()
                             .foregroundColor(.white)
@@ -40,7 +62,7 @@ struct PhotoPermissionView: View {
                     }
                     .contentShape(Rectangle())
                 }
-
+            } else {
                 Button(action: { showLibraryPicker = true }) {
                     Text("Upload from Photos")
                         .frame(maxWidth: .infinity)
@@ -86,6 +108,11 @@ struct PhotoPermissionView: View {
                 showCameraPicker = granted && cameraAvailable
             }
         }
+    }
+
+    private func openSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
     }
 }
 
