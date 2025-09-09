@@ -20,34 +20,29 @@ struct PhotoPermissionView: View {
                         Text("Take Photo")
                     }
                     .primaryButton()
-                    .contentShape(Rectangle())
                 } else {
                     if status == .denied || status == .restricted {
                         Button(action: { viewModel.openSettings() }) {
                             Text("Allow Camera Access")
                         }
-                        .primaryButton()
-                        .contentShape(Rectangle())
+                          .primaryButton()
                     } else {
                         Button(action: { viewModel.requestCameraPermission() }) {
                             Text("Allow Camera Access")
                         }
-                        .primaryButton()
-                        .contentShape(Rectangle())
+                          .primaryButton()
                     }
                 }
 
                 Button(action: { viewModel.showLibraryPicker = true }) {
                     Text("Upload from Photos")
                 }
-                .primaryButton()
-                .contentShape(Rectangle())
+                  .primaryButton()
             } else {
                 Button(action: { viewModel.showLibraryPicker = true }) {
                     Text("Upload from Photos")
                 }
-                .primaryButton()
-                .contentShape(Rectangle())
+                  .primaryButton()
             }
         }
         .padding()

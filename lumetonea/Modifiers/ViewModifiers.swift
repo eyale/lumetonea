@@ -1,8 +1,8 @@
 import SwiftUI
 
-struct PrimaryButtonModifier: ViewModifier {
-    func body(content: Content) -> some View {
-        content
+struct PrimaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
             .frame(maxWidth: .infinity)
             .padding()
             .foregroundColor(.white)
@@ -11,9 +11,9 @@ struct PrimaryButtonModifier: ViewModifier {
     }
 }
 
-extension View {
+extension Button {
     func primaryButton() -> some View {
-        modifier(PrimaryButtonModifier())
+        buttonStyle(PrimaryButtonStyle())
     }
 }
 

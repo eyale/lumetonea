@@ -22,7 +22,6 @@ struct ConfirmPhotoView: View {
                 Text("Confirm Photo")
             }
             .primaryButton()
-            .contentShape(Rectangle())
         }
         .padding()
         .background(Color.white)
