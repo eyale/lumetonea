@@ -1,12 +1,15 @@
 import SwiftUI
 import AVFoundation
 import UIKit
+import Observation
 
 struct PhotoPermissionView: View {
     @Environment(\.scenePhase) private var scenePhase
-    @StateObject private var viewModel = PhotoPermissionViewModel()
+    @State private var viewModel = PhotoPermissionViewModel()
 
     var body: some View {
+        @Bindable var viewModel = viewModel
+
         VStack(spacing: 24) {
             Text("We need access to your camera to let you take a photo.")
                 .multilineTextAlignment(.center)

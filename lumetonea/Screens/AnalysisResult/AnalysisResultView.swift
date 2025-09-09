@@ -3,7 +3,7 @@ import UIKit
 
 struct AnalysisResultView: View {
     let image: UIImage?
-    @StateObject private var viewModel = AnalysisResultViewModel()
+    @State private var viewModel = AnalysisResultViewModel()
 
     var body: some View {
         VStack(spacing: 24) {

@@ -1,11 +1,14 @@
 import SwiftUI
 import UIKit
+import Observation
 
 struct ConfirmPhotoView: View {
     let image: UIImage?
-    @StateObject private var viewModel = ConfirmPhotoViewModel()
+    @State private var viewModel = ConfirmPhotoViewModel()
 
     var body: some View {
+        @Bindable var viewModel = viewModel
+
         VStack(spacing: 24) {
             if let image = image {
                 Image(uiImage: image)

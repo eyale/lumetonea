@@ -1,7 +1,9 @@
 import SwiftUI
+import Observation
 
-final class ConfirmPhotoViewModel: ObservableObject {
-    @Published var navigateToAnalysis = false
+@Observable
+final class ConfirmPhotoViewModel {
+    var navigateToAnalysis = false
 
     func confirmPhoto() {
         navigateToAnalysis = true

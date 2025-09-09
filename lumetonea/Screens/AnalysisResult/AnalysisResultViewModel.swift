@@ -1,9 +1,11 @@
 import SwiftUI
 import UIKit
+import Observation
 
-final class AnalysisResultViewModel: ObservableObject {
-    @Published var processing = false
-    @Published var result: SkinToneResult?
+@Observable
+final class AnalysisResultViewModel {
+    var processing = false
+    var result: SkinToneResult?
 
     func analyze(image: UIImage?) {
         guard let image = image else { return }

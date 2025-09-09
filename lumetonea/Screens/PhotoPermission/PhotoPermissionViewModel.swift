@@ -1,14 +1,16 @@
 import SwiftUI
 import AVFoundation
 import UIKit
+import Observation
 
-final class PhotoPermissionViewModel: ObservableObject {
-    @Published var cameraAuthorized = AVCaptureDevice.authorizationStatus(for: .video) == .authorized
-    @Published var cameraAvailable = UIImagePickerController.isSourceTypeAvailable(.camera)
-    @Published var showCameraPicker = false
-    @Published var showLibraryPicker = false
-    @Published var selectedImage: UIImage?
-    @Published var navigateToConfirm = false
+@Observable
+final class PhotoPermissionViewModel {
+    var cameraAuthorized = AVCaptureDevice.authorizationStatus(for: .video) == .authorized
+    var cameraAvailable = UIImagePickerController.isSourceTypeAvailable(.camera)
+    var showCameraPicker = false
+    var showLibraryPicker = false
+    var selectedImage: UIImage?
+    var navigateToConfirm = false
 
     func requestCameraPermission() {
         guard cameraAvailable else {
