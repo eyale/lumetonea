@@ -9,17 +9,14 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "lamp")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("lumetonea")
-                .font(.title)
+        NavigationStack {
+            PhotoPermissionView()
         }
-        .padding()
+        .background(Color.white)
     }
 }
 
 #Preview {
     ContentView()
 }
+

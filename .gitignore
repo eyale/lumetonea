@@ -1,0 +1,49 @@
+# Xcode
+.DS_Store
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.playground/xcuserdata/
+DerivedData/
+build/
+*.ipa
+*.dSYM
+*.o
+*.lo
+*.la
+*.so
+*.dylib
+*.a
+*.bak
+*.swp
+*~.nib
+.hmap
+.lock-wlock
+.DS_Store?
+._*
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Carthage
+Carthage/
+
+# Swift Package Manager (SPM)
+.build/
+
+# Other
+xcuserdata/
+*.xcactivitylog
+*.xcscheme
+*.log
+*.mobileprovision
+*.pem
+*.p12
+*.key
+*.cer
+*.csr
+*.entitlements
+*.xccheckout
+*.xcscmblueprint
+*.xctestplan
