@@ -3,6 +3,7 @@ import AVFoundation
 import UIKit
 
 struct PhotoPermissionView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @State private var cameraAuthorized = AVCaptureDevice.authorizationStatus(for: .video) == .authorized
     @State private var cameraAvailable = UIImagePickerController.isSourceTypeAvailable(.camera)
     @State private var showCameraPicker = false
@@ -51,17 +52,17 @@ struct PhotoPermissionView: View {
                         }
                         .contentShape(Rectangle())
                     }
-
-                    Button(action: { showLibraryPicker = true }) {
-                        Text("Upload from Photos")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .foregroundColor(.white)
-                            .background(Color.navyBlue)
-                            .cornerRadius(8)
-                    }
-                    .contentShape(Rectangle())
                 }
+
+                Button(action: { showLibraryPicker = true }) {
+                    Text("Upload from Photos")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .foregroundColor(.white)
+                        .background(Color.navyBlue)
+                        .cornerRadius(8)
+                }
+                .contentShape(Rectangle())
             } else {
                 Button(action: { showLibraryPicker = true }) {
                     Text("Upload from Photos")
@@ -93,6 +94,11 @@ struct PhotoPermissionView: View {
         }
         .navigationDestination(isPresented: $navigateToConfirm) {
             ConfirmPhotoView(image: selectedImage)
+        }
+        .onChange(of: scenePhase) { phase in
+            if phase == .active {
+                cameraAuthorized = AVCaptureDevice.authorizationStatus(for: .video) == .authorized
+            }
         }
     }
 
