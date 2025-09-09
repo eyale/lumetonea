@@ -3,6 +3,7 @@ import Vision
 import CoreImage
 import CoreImage.CIFilterBuiltins
 
+/// Result of the skin tone analysis including LAB color values, temperature and shade.
 struct SkinToneResult {
     struct LAB {
         let l: CGFloat
@@ -25,9 +26,14 @@ struct SkinToneResult {
     let shade: Shade
 }
 
+/// Utility responsible for sampling prominent skin areas on a face and estimating overall tone.
 final class SkinToneExtractor {
     private let context = CIContext()
 
+    /// Performs asynchronous skin tone analysis of the provided image.
+    /// - Parameters:
+    ///   - image: Source image containing a face.
+    ///   - completion: Callback on the main thread with `SkinToneResult` or `nil` on failure.
     func analyze(image: UIImage, completion: @escaping (SkinToneResult?) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             guard let cgImage = image.cgImage else {
@@ -151,3 +157,4 @@ final class SkinToneExtractor {
         return (CGFloat(l), CGFloat(a), CGFloat(b))
     }
 }
+
