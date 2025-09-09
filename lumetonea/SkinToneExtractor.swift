@@ -2,7 +2,6 @@ import UIKit
 import Vision
 import CoreImage
 import CoreImage.CIFilterBuiltins
-import Accelerate
 
 struct SkinToneResult {
     struct LAB {
@@ -136,17 +135,19 @@ final class SkinToneExtractor {
     }
 
     private func rgbToLab(_ color: UIColor) -> (CGFloat, CGFloat, CGFloat)? {
-        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-        guard color.getRed(&r, green: &g, blue: &b, alpha: &a) else { return nil }
-        var rgb: [UInt8] = [UInt8(r * 255), UInt8(g * 255), UInt8(b * 255)]
-        var lab = [Float](repeating: 0, count: 3)
-        rgb.withUnsafeMutableBytes { rgbPtr in
-            lab.withUnsafeMutableBytes { labPtr in
-                var src = vImage_Buffer(data: rgbPtr.baseAddress!, height: 1, width: 1, rowBytes: 3)
-                var dest = vImage_Buffer(data: labPtr.baseAddress!, height: 1, width: 1, rowBytes: 3 * MemoryLayout<Float>.size)
-                vImageConvert_RGB888toLabF(&src, &dest, vImage_Flags(kvImageNoFlags))
-            }
+        // Convert the color into the generic Lab color space using Core Graphics
+        guard let labColor = color.cgColor.converted(to: CGColorSpace(name: CGColorSpace.genericLab)!,
+                                                    intent: .perceptual,
+                                                    options: nil),
+              let components = labColor.components,
+              components.count >= 3 else {
+            return nil
         }
-        return (CGFloat(lab[0]), CGFloat(lab[1]), CGFloat(lab[2]))
+
+        // Components are in 0-1 range; scale to conventional Lab values
+        let l = components[0] * 100.0
+        let a = (components[1] * 255.0) - 128.0
+        let b = (components[2] * 255.0) - 128.0
+        return (CGFloat(l), CGFloat(a), CGFloat(b))
     }
 }
