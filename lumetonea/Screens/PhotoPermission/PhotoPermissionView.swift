@@ -53,7 +53,8 @@ struct PhotoPermissionView: View {
         .navigationTitle("Add Photo")
         .navigationBarTitleDisplayMode(.inline)
         .fullScreenCover(isPresented: $viewModel.showCameraPicker) {
-            ImagePicker(image: $viewModel.selectedImage, sourceType: .camera) {
+            CameraView { captured in
+                viewModel.selectedImage = captured
                 viewModel.navigateToConfirm = viewModel.selectedImage != nil
             }
             .ignoresSafeArea()
@@ -78,4 +79,3 @@ struct PhotoPermissionView: View {
 #Preview {
     PhotoPermissionView()
 }
-
