@@ -10,6 +10,9 @@ struct ImagePicker: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
         picker.sourceType = sourceType
+        if sourceType == .camera && UIImagePickerController.isCameraDeviceAvailable(.front) {
+            picker.cameraDevice = .front
+        }
         picker.delegate = context.coordinator
         picker.modalPresentationStyle = .fullScreen
         return picker
@@ -30,7 +33,11 @@ struct ImagePicker: UIViewControllerRepresentable {
 
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let uiImage = info[.originalImage] as? UIImage {
-                parent.image = uiImage
+                if picker.cameraDevice == .front {
+                    parent.image = uiImage.withHorizontallyFlippedOrientation()
+                } else {
+                    parent.image = uiImage
+                }
             }
             parent.dismiss()
             parent.onComplete()
