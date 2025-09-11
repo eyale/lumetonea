@@ -10,6 +10,7 @@ final class CameraViewModel: NSObject, ObservableObject {
     @Published var complianceStatus: ComplianceStatus = .detecting
     @Published var statusMessage: String = "Fit head and shoulders in frame"
     @Published var debugInfo: FaceDebugInfo?
+    @Published var torsoPoints: [CGPoint]?
 
     // Calibration targets (nil = use defaults)
     @Published var targetFaceHeight: CGFloat? = nil
@@ -113,7 +114,7 @@ extension CameraViewModel: AVCaptureVideoDataOutputSampleBufferDelegate {
 
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
 
-        let request = VNDetectFaceLandmarksRequest { [weak self] req, _ in
+        let faceRequest = VNDetectFaceLandmarksRequest { [weak self] req, _ in
             guard let self else { return }
 
             if let faces = req.results as? [VNFaceObservation], let face = faces.first {
@@ -145,8 +146,31 @@ extension CameraViewModel: AVCaptureVideoDataOutputSampleBufferDelegate {
             }
         }
 
+        let bodyRequest = VNDetectHumanBodyPoseRequest { [weak self] req, _ in
+            guard let self else { return }
+            guard let obs = req.results as? [VNHumanBodyPoseObservation],
+                  let result = obs.first,
+                  let points = try? result.recognizedPoints(.all) else {
+                DispatchQueue.main.async { self.torsoPoints = nil }
+                return
+            }
+            guard let ls = points[.leftShoulder],
+                  let rs = points[.rightShoulder],
+                  let lh = points[.leftHip],
+                  let rh = points[.rightHip],
+                  ls.confidence > 0.1,
+                  rs.confidence > 0.1,
+                  lh.confidence > 0.1,
+                  rh.confidence > 0.1 else {
+                DispatchQueue.main.async { self.torsoPoints = nil }
+                return
+            }
+            let torso = [ls, rs, rh, lh].map { CGPoint(x: CGFloat($0.x), y: CGFloat($0.y)) }
+            DispatchQueue.main.async { self.torsoPoints = torso }
+        }
+
         let orientation: CGImagePropertyOrientation = .leftMirrored
-        do { try sequenceRequestHandler.perform([request], on: pixelBuffer, orientation: orientation) } catch {}
+        do { try sequenceRequestHandler.perform([faceRequest, bodyRequest], on: pixelBuffer, orientation: orientation) } catch {}
     }
 }
 

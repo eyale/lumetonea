@@ -31,6 +31,23 @@ struct CameraView: View {
                     .strokeBorder(color, lineWidth: 5)
                     .padding(24)
 
+                if let torso = camera.torsoPoints, torso.count == 4 {
+                    Path { path in
+                        let convert: (CGPoint) -> CGPoint = { pt in
+                            CGPoint(
+                                x: pt.x * geo.size.width,
+                                y: (1 - pt.y) * geo.size.height
+                            )
+                        }
+                        path.move(to: convert(torso[0]))
+                        path.addLine(to: convert(torso[1]))
+                        path.addLine(to: convert(torso[2]))
+                        path.addLine(to: convert(torso[3]))
+                        path.closeSubpath()
+                    }
+                    .fill(Color.blue.opacity(0.3))
+                }
+
                 // Optional guidance text
                 VStack {
                     HStack { Spacer() }
