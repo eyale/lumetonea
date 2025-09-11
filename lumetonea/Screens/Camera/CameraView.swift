@@ -27,9 +27,10 @@ struct CameraView: View {
                     }
                 }()
 
-                RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(color, lineWidth: 5)
+                RoundedRectangle(cornerRadius: 40)
+                    .strokeBorder(color, lineWidth: 3)
                     .padding(24)
+                    .padding(.top, 40)
 
                 if let torso = camera.torsoPoints, torso.count == 4 {
                     Path { path in
@@ -57,7 +58,7 @@ struct CameraView: View {
                         .padding(.horizontal, 16)
                         .padding(.vertical, 12)
                         .background(.ultraThinMaterial, in: Capsule())
-                        .padding(.bottom, 150)
+                        .padding(.bottom, 130)
                 }
 
                 if debugEnabled, let d = camera.debugInfo {
@@ -113,7 +114,8 @@ struct CameraView: View {
                         }
                     }
                 }
-                .padding([.top, .leading, .trailing], 16)
+                .padding(.horizontal, 24)
+                .padding(.top, 56)
 
                 Spacer()
 
