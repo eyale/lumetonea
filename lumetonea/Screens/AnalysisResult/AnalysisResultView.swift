@@ -13,6 +13,7 @@ struct AnalysisResultView: View {
                 if let image = image {
                     GeometryReader { geo in
                         let size = geo.size
+                        if viewModel.debug { print("[Recolor] GeometryReader size=\(size)") }
                         ZStack(alignment: .top) {
                             Image(uiImage: image)
                                 .resizable()
@@ -28,10 +29,12 @@ struct AnalysisResultView: View {
                                             y: (1 - pt.y) * size.height
                                         )
                                     }
-                                    path.move(to: convert(torso[0]))
-                                    path.addLine(to: convert(torso[1]))
-                                    path.addLine(to: convert(torso[2]))
-                                    path.addLine(to: convert(torso[3]))
+                                    let pts = torso.map(convert)
+                                    if viewModel.debug { print("[Recolor] drawing torso pts=\(pts)") }
+                                    path.move(to: pts[0])
+                                    path.addLine(to: pts[1])
+                                    path.addLine(to: pts[2])
+                                    path.addLine(to: pts[3])
                                     path.closeSubpath()
                                 }
                                 .fill(Color.green.opacity(0.35))
