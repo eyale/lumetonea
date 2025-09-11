@@ -13,7 +13,6 @@ struct AnalysisResultView: View {
                 if let image = image {
                     GeometryReader { geo in
                         let size = geo.size
-                        if viewModel.debug { print("[Recolor] GeometryReader size=\(size)") }
                         ZStack(alignment: .top) {
                             Image(uiImage: image)
                                 .resizable()
@@ -38,6 +37,11 @@ struct AnalysisResultView: View {
                                     path.closeSubpath()
                                 }
                                 .fill(Color.green.opacity(0.35))
+                            }
+                        }
+                        .onAppear {
+                            if viewModel.debug {
+                                print("[Recolor] GeometryReader size=\(size)")
                             }
                         }
                     }
