@@ -24,7 +24,8 @@ final class AnalysisResultViewModel {
     private func detectTorso(in image: UIImage) {
         guard let cg = image.cgImage else { return }
         let request = VNDetectHumanBodyPoseRequest()
-        let handler = VNImageRequestHandler(cgImage: cg, orientation: .leftMirrored, options: [:])
+        let orientation = CGImagePropertyOrientation(image)
+        let handler = VNImageRequestHandler(cgImage: cg, orientation: orientation, options: [:])
         do {
             try handler.perform([request])
             guard let obs = request.results?.first,

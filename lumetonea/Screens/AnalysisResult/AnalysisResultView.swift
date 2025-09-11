@@ -34,7 +34,7 @@ struct AnalysisResultView: View {
                                     path.addLine(to: convert(torso[3]))
                                     path.closeSubpath()
                                 }
-                                .fill(Color.blue.opacity(0.3))
+                                .fill(Color.green.opacity(0.35))
                             }
                         }
                     }
