@@ -113,7 +113,7 @@ extension CameraViewModel: AVCaptureVideoDataOutputSampleBufferDelegate {
 
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
 
-        let request = VNDetectFaceLandmarksRequest { [weak self] req, _ in
+        let faceRequest = VNDetectFaceLandmarksRequest { [weak self] req, _ in
             guard let self else { return }
 
             if let faces = req.results as? [VNFaceObservation], let face = faces.first {
@@ -146,7 +146,7 @@ extension CameraViewModel: AVCaptureVideoDataOutputSampleBufferDelegate {
         }
 
         let orientation: CGImagePropertyOrientation = .leftMirrored
-        do { try sequenceRequestHandler.perform([request], on: pixelBuffer, orientation: orientation) } catch {}
+        do { try sequenceRequestHandler.perform([faceRequest], on: pixelBuffer, orientation: orientation) } catch {}
     }
 }
 

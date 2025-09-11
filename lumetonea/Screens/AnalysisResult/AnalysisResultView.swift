@@ -9,13 +9,35 @@ struct AnalysisResultView: View {
     var body: some View {
         @Bindable var viewModel = viewModel
         VStack(spacing: 0) {
-            VStack(spacing: 0) {
+            ZStack {
                 if let image = image {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFill()
-                        .clipped()
-                        .ignoresSafeArea(edges: .top)
+                    GeometryReader { geo in
+                        let size = geo.size
+                        ZStack(alignment: .top) {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: size.width, height: size.height)
+                                .clipped()
+                                .ignoresSafeArea(edges: .top)
+                            if let torso = viewModel.torsoPoints, torso.count == 4 {
+                                Path { path in
+                                    let convert: (CGPoint) -> CGPoint = { pt in
+                                        CGPoint(
+                                            x: pt.x * size.width,
+                                            y: (1 - pt.y) * size.height
+                                        )
+                                    }
+                                    path.move(to: convert(torso[0]))
+                                    path.addLine(to: convert(torso[1]))
+                                    path.addLine(to: convert(torso[2]))
+                                    path.addLine(to: convert(torso[3]))
+                                    path.closeSubpath()
+                                }
+                                .fill(Color.blue.opacity(0.3))
+                            }
+                        }
+                    }
                 } else {
                     Text("No image provided")
                         .primaryText()
