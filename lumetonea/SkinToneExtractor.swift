@@ -26,21 +26,6 @@ struct SkinToneResult {
     let shade: Shade
 }
 
-private extension CGImagePropertyOrientation {
-    init(_ ui: UIImage.Orientation) {
-        switch ui {
-        case .up: self = .up
-        case .down: self = .down
-        case .left: self = .left
-        case .right: self = .right
-        case .upMirrored: self = .upMirrored
-        case .downMirrored: self = .downMirrored
-        case .leftMirrored: self = .leftMirrored
-        case .rightMirrored: self = .rightMirrored
-        @unknown default: self = .up
-        }
-    }
-}
 
 /// Utility responsible for sampling prominent skin areas on a face and estimating overall tone.
 final class SkinToneExtractor {
@@ -64,7 +49,7 @@ final class SkinToneExtractor {
             }
 
             let request = VNDetectFaceLandmarksRequest()
-            let cgOrientation = CGImagePropertyOrientation(image.imageOrientation)
+            let cgOrientation = CGImagePropertyOrientation(image)
             if self.debug { print("[SkinTone] using CGImagePropertyOrientation=\(cgOrientation.rawValue)") }
             let handler = VNImageRequestHandler(cgImage: cgImage, orientation: cgOrientation, options: [:])
 
