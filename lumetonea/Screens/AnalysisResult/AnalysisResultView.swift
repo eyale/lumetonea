@@ -9,19 +9,48 @@ struct AnalysisResultView: View {
     var body: some View {
         @Bindable var viewModel = viewModel
         VStack(spacing: 0) {
-            VStack(spacing: 0) {
+            ZStack {
                 if let image = image {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFill()
-                        .clipped()
-                        .ignoresSafeArea(edges: .top)
+                    GeometryReader { geo in
+                        let size = geo.size
+                        ZStack(alignment: .top) {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: size.width, height: size.height)
+                                .clipped()
+                            if let torso = viewModel.torsoPoints, torso.count == 4 {
+                                Path { path in
+                                    let convert: (CGPoint) -> CGPoint = { pt in
+                                        CGPoint(
+                                            x: pt.x * size.width,
+                                            y: (1 - pt.y) * size.height
+                                        )
+                                    }
+                                    let pts = torso.map(convert)
+                                    if viewModel.debug { print("[Recolor] drawing torso pts=\(pts)") }
+                                    path.move(to: pts[0])
+                                    path.addLine(to: pts[1])
+                                    path.addLine(to: pts[2])
+                                    path.addLine(to: pts[3])
+                                    path.closeSubpath()
+                                }
+                                .fill(Color.green.opacity(0.35))
+                            }
+                        }
+                        .onAppear {
+                            if viewModel.debug {
+                                print("[Recolor] GeometryReader size=\(size)")
+                            }
+                        }
+                    }
+                    .ignoresSafeArea()
+                    .frame(height: topHeight, alignment: .top)
                 } else {
                     Text("No image provided")
                         .primaryText()
                 }
             }
-            .frame(height: topHeight, alignment: .top)
             Spacer()
             controlsView
             Spacer()
@@ -34,6 +63,7 @@ struct AnalysisResultView: View {
 
     var controlsView: some View {
         VStack(spacing: 16) {
+            Text("Results")
             if let result = viewModel.result {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Results")

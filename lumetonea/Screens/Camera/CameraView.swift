@@ -27,9 +27,10 @@ struct CameraView: View {
                     }
                 }()
 
-                RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(color, lineWidth: 5)
+                RoundedRectangle(cornerRadius: 40)
+                    .strokeBorder(color, lineWidth: 3)
                     .padding(24)
+                    .padding(.top, 40)
 
                 // Optional guidance text
                 VStack {
@@ -40,7 +41,7 @@ struct CameraView: View {
                         .padding(.horizontal, 16)
                         .padding(.vertical, 12)
                         .background(.ultraThinMaterial, in: Capsule())
-                        .padding(.bottom, 150)
+                        .padding(.bottom, 130)
                 }
 
                 if debugEnabled, let d = camera.debugInfo {
@@ -96,7 +97,8 @@ struct CameraView: View {
                         }
                     }
                 }
-                .padding([.top, .leading, .trailing], 16)
+                .padding(.top, 56)
+                .padding(.horizontal, 16)
 
                 Spacer()
 
