@@ -19,7 +19,6 @@ struct AnalysisResultView: View {
                                 .scaledToFill()
                                 .frame(width: size.width, height: size.height)
                                 .clipped()
-                                .ignoresSafeArea(edges: .top)
                             if let torso = viewModel.torsoPoints, torso.count == 4 {
                                 Path { path in
                                     let convert: (CGPoint) -> CGPoint = { pt in
@@ -45,12 +44,13 @@ struct AnalysisResultView: View {
                             }
                         }
                     }
+                    .ignoresSafeArea()
+                    .frame(height: topHeight, alignment: .top)
                 } else {
                     Text("No image provided")
                         .primaryText()
                 }
             }
-            .frame(height: topHeight, alignment: .top)
             Spacer()
             controlsView
             Spacer()
@@ -63,6 +63,7 @@ struct AnalysisResultView: View {
 
     var controlsView: some View {
         VStack(spacing: 16) {
+            Text("Results")
             if let result = viewModel.result {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Results")

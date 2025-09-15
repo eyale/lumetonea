@@ -35,7 +35,7 @@ final class AnalysisResultViewModel {
                 return
             }
             let points = try? obs.recognizedPoints(.all)
-            if debug { print("[Recolor] detectTorso(): points keys=\(points?.keys ?? [])") }
+            if debug { print("[Recolor] detectTorso(): points keys=\(points?.keys)") }
             guard let ls = points?[.leftShoulder],
                   let rs = points?[.rightShoulder],
                   let lh = points?[.leftHip],
