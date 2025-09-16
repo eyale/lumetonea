@@ -95,7 +95,7 @@ struct AnalysisResultView: View {
         .sheet(isPresented: $showResultsSheet) {
             ResultsSheetView(result: viewModel.result)
                 .presentationDetents([.height(260), .medium, .large])
-                .presentationDragIndicator(.visible)
+                .presentationDragIndicator(.hidden)
         }
     }
 
@@ -170,15 +170,17 @@ struct AnalysisResultView: View {
         }
         .padding(.top, 8)
     }
+}
 
-    private func startOver() {
+// MARK: - Helpers
+private extension AnalysisResultView {
+    func startOver() {
         // Signal ConfirmPhotoView to pop again, then dismiss once here
         nav.popToRoot = true
         dismiss()
     }
-
-    // MARK: - Helpers
-    private func hexString(for color: Color) -> String {
+    
+    func hexString(for color: Color) -> String {
         // Convert SwiftUI.Color to sRGB components and format as #RRGGBB
         #if canImport(UIKit)
         let ui = UIColor(color)
@@ -191,77 +193,6 @@ struct AnalysisResultView: View {
         }
         #endif
         return "#FFFFFF"
-    }
-}
-
-// MARK: - Results Bottom Sheet
-private struct ResultsSheetView: View {
-    let result: SkinToneResult?
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Capsule()
-                .fill(Color.secondary.opacity(0.25))
-                .frame(width: 40, height: 5)
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.top, 8)
-
-            Text("Results")
-                .font(.headline)
-                .primaryText()
-
-            if let result {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Undertone: \(result.temperature == .warm ? "Warm" : "Cool")")
-                        .primaryText()
-                    Text(result.temperature == .warm
-                         ? "Warm = more red/yellow undertones (higher a*)."
-                         : "Cool = more blue/green undertones (lower a*).")
-                        .font(.footnote)
-                        .foregroundColor(.gray)
-                    Text("Shade: \(result.shade == .light ? "Light" : "Dark")")
-                        .primaryText()
-                    Text("Shade is based on L* (perceptual lightness). Higher L* looks lighter.")
-                        .font(.footnote)
-                        .foregroundColor(.gray)
-                    Text(String(format: "LAB ≈ L=%.1f a=%.1f b=%.1f", result.lab.l, result.lab.a, result.lab.b))
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
-            } else {
-                Text("Analyzing...")
-                    .foregroundColor(.gray)
-            }
-
-            Spacer(minLength: 0)
-        }
-        .padding()
-        .background(Color(.systemBackground))
-    }
-}
-
-// MARK: - Info Sheet
-private struct InfoSheetView: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Capsule()
-                .fill(Color.secondary.opacity(0.25))
-                .frame(width: 40, height: 5)
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.top, 8)
-
-            Text("Overlay Info")
-                .font(.headline)
-                .primaryText()
-
-            Text("The horizontal line aligns with the detected chin. The area below the line is highlighted using your selected color and opacity. Use this to preview how different shirt colors might look.")
-                .font(.body)
-                .foregroundColor(.gray)
-
-            Spacer()
-        }
-        .padding()
-        .background(Color(.systemBackground))
     }
 }
 
