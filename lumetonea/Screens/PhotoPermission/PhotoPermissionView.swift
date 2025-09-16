@@ -1,11 +1,13 @@
 import SwiftUI
 import AVFoundation
 import UIKit
+import PhotosUI
 import Observation
 
 struct PhotoPermissionView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var viewModel = PhotoPermissionViewModel()
+    @State private var pickerItem: PhotosPickerItem?
 
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -36,16 +38,13 @@ struct PhotoPermissionView: View {
                           .primaryButton()
                     }
                 }
-
-                Button(action: { viewModel.showLibraryPicker = true }) {
+                PhotosPicker(selection: $pickerItem, matching: .images, photoLibrary: .shared()) {
                     Text("Upload from Photos")
                 }
-                  .primaryButton()
             } else {
-                Button(action: { viewModel.showLibraryPicker = true }) {
+                PhotosPicker(selection: $pickerItem, matching: .images, photoLibrary: .shared()) {
                     Text("Upload from Photos")
                 }
-                  .primaryButton()
             }
         }
         .padding()
@@ -59,17 +58,21 @@ struct PhotoPermissionView: View {
             }
             .ignoresSafeArea()
         }
-        .fullScreenCover(isPresented: $viewModel.showLibraryPicker) {
-            ImagePicker(image: $viewModel.selectedImage, sourceType: .photoLibrary) {
-                viewModel.navigateToConfirm = viewModel.selectedImage != nil
-            }
-            .ignoresSafeArea()
-        }
         .navigationDestination(isPresented: $viewModel.navigateToConfirm) {
             ConfirmPhotoView(image: viewModel.selectedImage)
         }
-        .onChange(of: scenePhase) { phase in
-            if phase == .active {
+        .onChange(of: pickerItem) { _, newItem in
+            guard let item = newItem else { return }
+            Task {
+                if let data = try? await item.loadTransferable(type: Data.self),
+                   let uiImage = UIImage(data: data) {
+                    viewModel.selectedImage = uiImage
+                    viewModel.navigateToConfirm = true
+                }
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
                 viewModel.updateCameraAuthorization()
             }
         }

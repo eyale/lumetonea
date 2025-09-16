@@ -5,6 +5,8 @@ struct AnalysisResultView: View {
     let image: UIImage?
     @State private var viewModel = AnalysisResultViewModel()
     let topHeight = UIScreen.main.bounds.height * 0.5
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var nav: NavigationCoordinator
 
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -54,6 +56,7 @@ struct AnalysisResultView: View {
             Spacer()
             controlsView
             Spacer()
+            ctaButtonView
         }
         .background(Color.white)
         .navigationTitle("Result")
@@ -61,9 +64,15 @@ struct AnalysisResultView: View {
         .onAppear { viewModel.analyze(image: image) }
     }
 
+    var ctaButtonView: some View {
+        Button(action: startOver) {
+            Text("Start Over")
+        }
+        .primaryButton()
+    }
+
     var controlsView: some View {
         VStack(spacing: 16) {
-            Text("Results")
             if let result = viewModel.result {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Results")
@@ -90,6 +99,12 @@ struct AnalysisResultView: View {
             }
         }
         .padding()
+    }
+
+    private func startOver() {
+        // Signal ConfirmPhotoView to pop again, then dismiss once here
+        nav.popToRoot = true
+        dismiss()
     }
 }
 

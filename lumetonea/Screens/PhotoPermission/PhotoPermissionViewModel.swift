@@ -35,4 +35,3 @@ final class PhotoPermissionViewModel {
         cameraAuthorized = AVCaptureDevice.authorizationStatus(for: .video) == .authorized
     }
 }
-

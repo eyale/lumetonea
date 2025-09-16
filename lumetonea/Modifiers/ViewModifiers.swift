@@ -3,8 +3,7 @@ import SwiftUI
 struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .frame(maxWidth: .infinity)
-            .padding()
+            .frame(width: 200, height: 50)
             .foregroundColor(.white)
             .background(Color.navyBlue)
             .cornerRadius(8)
@@ -19,7 +18,7 @@ extension Button {
 
 struct PrimaryTextModifier: ViewModifier {
     func body(content: Content) -> some View {
-        content.foregroundColor(.black)
+        content.foregroundColor(.black.opacity(0.8))
     }
 }
 

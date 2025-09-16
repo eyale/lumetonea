@@ -6,20 +6,14 @@ struct ConfirmPhotoView: View {
     let image: UIImage?
     @State private var viewModel = ConfirmPhotoViewModel()
     let topHeight = UIScreen.main.bounds.height * 0.5
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var nav: NavigationCoordinator
 
     var body: some View {
         VStack(spacing: 0) {
             imageView
             Spacer()
-            // Controls area
-            VStack(spacing: 16) {
-                Button(action: { viewModel.confirmPhoto() }) {
-                    Text("Confirm Photo")
-                }
-                .primaryButton()
-                .padding()
-            }
-            .padding()
+            ctaButtonView
         }
         .background(Color.white)
         .navigationTitle("Confirm")
@@ -27,6 +21,21 @@ struct ConfirmPhotoView: View {
         .navigationDestination(isPresented: $viewModel.navigateToAnalysis) {
             AnalysisResultView(image: image)
         }
+        .onChange(of: nav.popToRoot) { _, newValue in
+            if newValue {
+                nav.popToRoot = false
+                dismiss()
+            }
+        }
+    }
+
+    var ctaButtonView: some View {
+        Button {
+            viewModel.confirmPhoto()
+        } label: {
+            Text("Confirm Photo")
+        }
+        .primaryButton()
     }
 
     var imageView: some View {

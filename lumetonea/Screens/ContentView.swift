@@ -8,15 +8,16 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var nav = NavigationCoordinator()
     var body: some View {
         NavigationStack {
             PhotoPermissionView()
         }
         .background(Color.white)
+        .environmentObject(nav)
     }
 }
 
 #Preview {
     ContentView()
 }
-
