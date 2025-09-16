@@ -17,6 +17,10 @@ struct AnalysisResultView: View {
     @State private var underlayColor: Color = .white
     @State private var underlayOpacity: CGFloat = 0.55
 
+    // Sheets
+    @State private var showResultsSheet: Bool = false
+    @State private var showInfoSheet: Bool = false
+
     var body: some View {
         @Bindable var viewModel = viewModel
         VStack(spacing: 0) {
@@ -63,38 +67,78 @@ struct AnalysisResultView: View {
                         .primaryText()
                 }
             }
+
             Spacer()
+
             controlsView
+
             Spacer()
+
             ctaButtonView
         }
         .background(Color.white)
         .navigationTitle("Result")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { viewModel.analyze(image: image) }
+        .onAppear {
+            viewModel.analyze(image: image)
+            // Auto-open the results sheet once results are available
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                if viewModel.result != nil {
+                    showResultsSheet = true
+                }
+            }
+        }
+        .sheet(isPresented: $showInfoSheet) {
+            InfoSheetView()
+                .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showResultsSheet) {
+            ResultsSheetView(result: viewModel.result)
+                .presentationDetents([.height(260), .medium, .large])
+                .presentationDragIndicator(.visible)
+        }
     }
 
     var ctaButtonView: some View {
-        Button(action: startOver) {
-            Text("Start Over")
+        HStack {
+            Button(action: { showResultsSheet = true }) {
+                Label("Show Results", systemImage: "chevron.up.circle")
+            }
+            .buttonStyle(.bordered)
+
+            Spacer()
+
+            Button(action: startOver) {
+                Text("Start Over")
+            }
+            .primaryButton()
         }
-        .primaryButton()
+        .padding(.horizontal)
+        .padding(.bottom)
     }
 
-    //
-
+    // MARK: - Controls (color + opacity + info)
     var controlsView: some View {
         VStack(spacing: 16) {
-            // Color controls for the underlay
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 10) {
                 Text("Overlay Controls")
                     .font(.headline)
                     .primaryText()
 
-                // ColorPicker to choose underlay color
-                ColorPicker("Underlay Color", selection: $underlayColor, supportsOpacity: false)
-                    .labelsHidden()
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                // ColorPicker to choose underlay color + HEX readout
+                HStack(spacing: 12) {
+                    ColorPicker("Underlay Color", selection: $underlayColor, supportsOpacity: false)
+                        .labelsHidden()
+
+                    // HEX of the selected color
+                    Text(hexString(for: underlayColor))
+                        .font(.caption.monospaced())
+                        .foregroundColor(.gray)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.gray.opacity(0.12), in: Capsule())
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
 
                 // Slider to adjust underlay opacity
                 HStack {
@@ -107,46 +151,117 @@ struct AnalysisResultView: View {
                         .foregroundColor(.gray)
                         .frame(width: 44, alignment: .trailing)
                 }
+
+                // Info icon under the opacity slider
+                HStack {
+                    Button {
+                        showInfoSheet = true
+                    } label: {
+                        Label("What does this do?", systemImage: "info.circle")
+                            .font(.footnote)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundColor(.navyBlue)
+
+                    Spacer()
+                }
             }
             .padding(.horizontal)
-
-            if let result = viewModel.result {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Results")
-                        .font(.headline)
-                        .primaryText()
-                    Text("Undertone: \(result.temperature == .warm ? "Warm" : "Cool")")
-                        .primaryText()
-                        .minimumScaleFactor(0.5)
-                    Text(result.temperature == .warm
-                         ? "Warm = more red/yellow undertones (higher a*)."
-                         : "Cool = more blue/green undertones (lower a*).")
-                        .font(.footnote)
-                        .foregroundColor(.gray)
-                        .minimumScaleFactor(0.5)
-                    Text("Shade: \(result.shade == .light ? "Light" : "Dark")")
-                        .primaryText()
-                        .minimumScaleFactor(0.5)
-                    Text("Shade is based on L* (perceptual lightness). Higher L* looks lighter.")
-                        .font(.footnote)
-                        .foregroundColor(.gray)
-                        .minimumScaleFactor(0.5)
-                    Text(String(format: "LAB ≈ L=%.1f a=%.1f b=%.1f", result.lab.l, result.lab.a, result.lab.b))
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                        .minimumScaleFactor(0.5)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-            }
         }
-        .padding()
+        .padding(.top, 8)
     }
 
     private func startOver() {
         // Signal ConfirmPhotoView to pop again, then dismiss once here
         nav.popToRoot = true
         dismiss()
+    }
+
+    // MARK: - Helpers
+    private func hexString(for color: Color) -> String {
+        // Convert SwiftUI.Color to sRGB components and format as #RRGGBB
+        #if canImport(UIKit)
+        let ui = UIColor(color)
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        if ui.getRed(&r, green: &g, blue: &b, alpha: &a) {
+            let R = Int(round(r * 255))
+            let G = Int(round(g * 255))
+            let B = Int(round(b * 255))
+            return String(format: "#%02X%02X%02X", R, G, B)
+        }
+        #endif
+        return "#FFFFFF"
+    }
+}
+
+// MARK: - Results Bottom Sheet
+private struct ResultsSheetView: View {
+    let result: SkinToneResult?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Capsule()
+                .fill(Color.secondary.opacity(0.25))
+                .frame(width: 40, height: 5)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 8)
+
+            Text("Results")
+                .font(.headline)
+                .primaryText()
+
+            if let result {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Undertone: \(result.temperature == .warm ? "Warm" : "Cool")")
+                        .primaryText()
+                    Text(result.temperature == .warm
+                         ? "Warm = more red/yellow undertones (higher a*)."
+                         : "Cool = more blue/green undertones (lower a*).")
+                        .font(.footnote)
+                        .foregroundColor(.gray)
+                    Text("Shade: \(result.shade == .light ? "Light" : "Dark")")
+                        .primaryText()
+                    Text("Shade is based on L* (perceptual lightness). Higher L* looks lighter.")
+                        .font(.footnote)
+                        .foregroundColor(.gray)
+                    Text(String(format: "LAB ≈ L=%.1f a=%.1f b=%.1f", result.lab.l, result.lab.a, result.lab.b))
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+            } else {
+                Text("Analyzing...")
+                    .foregroundColor(.gray)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding()
+        .background(Color(.systemBackground))
+    }
+}
+
+// MARK: - Info Sheet
+private struct InfoSheetView: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Capsule()
+                .fill(Color.secondary.opacity(0.25))
+                .frame(width: 40, height: 5)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 8)
+
+            Text("Overlay Info")
+                .font(.headline)
+                .primaryText()
+
+            Text("The horizontal line aligns with the detected chin. The area below the line is highlighted using your selected color and opacity. Use this to preview how different shirt colors might look.")
+                .font(.body)
+                .foregroundColor(.gray)
+
+            Spacer()
+        }
+        .padding()
+        .background(Color(.systemBackground))
     }
 }
 
